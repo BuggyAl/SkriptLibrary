@@ -1,0 +1,55 @@
+Options:
+	JoinMessage: &7[&a+&7] &7%player%
+	QuitMessage: &7[&c-&7] &7%player%
+	StaffJoinMessage: &e%player% &ahas unvanished!
+	StaffQuitMessage: &e%player% &ahas vanished!
+
+on join:
+	if {vanished::%player's uuid%} is not set:
+		set {vanished::%player's uuid%} to false
+	else if {vanished::%player's uuid%} is true:
+		hide the player from all players
+		loop all players:
+			if player has permission "vanish.see":
+				reveal the player to loop-player
+	if player doesnt have permission "vanish.see":
+		loop {vanishedPlayers::*}:
+			hide (loop-value parsed as player) from player
+
+command /vanish:
+	permission: vanish.use
+	permission message: &cYou don't have permission to use that command!
+	aliases: /v
+	trigger:
+		if {vanished::%player's uuid%} is true:
+			set {vanished::%player's uuid%} to false # unvanish
+			reveal the player to all players
+			if {vanishedPlayers::*} contains player:
+				remove player from {vanishedPlayers::*}
+			send "&aYou are now unvanished!" to player
+			loop all players:
+				if player has permission vanish.see:
+					send {@StaffJoinMessage} to loop-player
+				else:
+					send {@JoinMessage}to loop-player
+		else:
+			set {vanished::%player's uuid%} to true # vanish
+			vanishPlayer(player)
+			loop all players:
+				if loop-player is not player:
+					if loop-player has permission vanish.see:
+						send {@StaffQuitMessage} to loop-player
+					else:
+						send {@QuitMessage} to loop-player
+
+function vanishPlayer(p: player):
+	hide the player from all players
+	if {vanishedPlayers::*} does not contain player:
+		add player to {vanishedPlayers::*}
+	loop all players:
+		if player has permission vanish.see:
+			reveal the player to loop-player
+	send "&aYou are now vanished!" to {_p}
+
+on server list ping:
+	hide {vanishedPlayers::*} from the server list
