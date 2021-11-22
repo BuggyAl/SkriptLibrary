@@ -12,7 +12,10 @@ on join:
 		loop all players:
 			if player has permission "vanish.see":
 				reveal the player to loop-player
-	if player doesnt have permission "vanish.see":
+		loop 10 times:
+			send action bar "&eYou are currently &aVANISHED&e!" to player
+			wait 1 second
+	if player does not have permission "vanish.see":
 		loop {vanishedPlayers::*}:
 			hide (loop-value parsed as player) from player
 
@@ -28,27 +31,28 @@ command /vanish:
 				remove player from {vanishedPlayers::*}
 			send "&aYou are now unvanished!" to player
 			loop all players:
-				if player has permission vanish.see:
-					send {@StaffJoinMessage} to loop-player
-				else:
-					send {@JoinMessage}to loop-player
+				if loop-player is not player:
+					if loop-player has permission "vanish.see":
+						send "{@StaffJoinMessage}" to loop-player
+					else:
+						send "{@JoinMessage}" to loop-player
 		else:
 			set {vanished::%player's uuid%} to true # vanish
 			vanishPlayer(player)
 			loop all players:
 				if loop-player is not player:
-					if loop-player has permission vanish.see:
-						send {@StaffQuitMessage} to loop-player
+					if loop-player has permission "vanish.see":
+						send "{@StaffQuitMessage}" to loop-player
 					else:
-						send {@QuitMessage} to loop-player
+						send "{@QuitMessage}" to loop-player
 
 function vanishPlayer(p: player):
-	hide the player from all players
+	hide {_p} from all players
 	if {vanishedPlayers::*} does not contain player:
-		add player to {vanishedPlayers::*}
+		add {_p} to {vanishedPlayers::*}
 	loop all players:
-		if player has permission vanish.see:
-			reveal the player to loop-player
+		if loop-player has permission "vanish.see":
+			reveal {_p} to loop-player
 	send "&aYou are now vanished!" to {_p}
 
 on server list ping:
