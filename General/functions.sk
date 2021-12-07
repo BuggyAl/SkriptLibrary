@@ -1,0 +1,13 @@
+# A bunch of useful functions to use on your server!
+
+function getNumberFormatted(n: number) :: text: # formats a number (ex: 1,000,000 --> 1M)
+	set {_data} to "Sx,21|Qi,18|Qa,15|T,12|B,9|M,6|K,3"
+	loop split {_data} at "|":
+		set {_s::*} to split loop-value at ","
+		{_n} >= 10 ^ {_s::2} parsed as number
+		set {_result} to floor({_n} / 10 ^ (({_s::2} parsed as number) - 2)) / 100
+		return "%{_result}%%{_s::1}%"
+	return "%{_n}%"
+ 
+function getUUID(p: player) :: text:
+  return uuid of {_p}
